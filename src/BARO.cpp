@@ -65,10 +65,11 @@ float LPS22HBClass::readPressure(int units)
     // trigger one shot
     i2cWrite(LPS22HB_CTRL2_REG, 0x01);
 
-    // wait for ONE_SHOT bit to be cleared by the hardware
+#if !defined(ARDUINO_EDGE_CONTROL)
     while ((i2cRead(LPS22HB_CTRL2_REG) & 0x01) != 0) {
       yield();
     }
+#endif
 
     float reading = (i2cRead(LPS22HB_PRESS_OUT_XL_REG) |
             (i2cRead(LPS22HB_PRESS_OUT_L_REG) << 8) |
@@ -120,7 +121,7 @@ int LPS22HBClass::i2cWrite(uint8_t reg, uint8_t val)
   return 1;
 }
 
-#ifdef ARDUINO_ARDUINO_NANO33BLE
+#if defined(ARDUINO_ARDUINO_NANO33BLE) || defined(ARDUINO_EDGE_CONTROL)
 LPS22HBClass BARO(Wire1);
 #else
 LPS22HBClass BARO(Wire);
